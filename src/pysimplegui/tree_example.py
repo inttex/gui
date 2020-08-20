@@ -52,7 +52,7 @@ layout = [[sg.Text('File and folder browser Test')],
            ],
           [sg.Button('Ok'), sg.Button('Cancel')]]
 
-window = sg.Window('Tree Element Test', layout)
+window = sg.Window('Tree Element Test', layout, location = (0,0))
 
 while True:  # Event Loop
     event, values = window.read()
