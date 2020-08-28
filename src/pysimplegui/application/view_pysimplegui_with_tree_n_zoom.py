@@ -126,7 +126,7 @@ class ViewWithTree(ViewInterface):
             if event == '-SLIDER-':
                 slider_value = values['-SLIDER-']
                 self.text.update(slider_value)
-                self.controller.apply_algo(input_data=slider_value, dv=self.dv)
+                self.controller.topo_algo(input_data=slider_value, dv=self.dv)
             if event == '-T0-':
                 y = 2 * np.linspace(0, 3, 100, endpoint=False) - 8
                 x = 10 * np.sin(y * 1.2) + 10

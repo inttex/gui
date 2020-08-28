@@ -21,7 +21,7 @@ class Controller(ControllerInterface):
         self._update_views()
 
     def apply_algo(self, input_data, dv: DrawableVisualizer):
-        thread = Thread(target=self._run_threaded_algo, args=(self.model.apply_algo, (input_data, dv)))
+        thread = Thread(target=self._run_threaded_algo, args=(self.model.topo_algo, (input_data, dv)))
         thread.start()
 
     def init_with_model_n_view(self, model, views):

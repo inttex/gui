@@ -36,7 +36,7 @@ class View(ViewInterface):
             if event == sg.WIN_CLOSED:
                 break
             if event == '-T0-':
-                self.controller.apply_algo(input_data=1)
+                self.controller.topo_algo(input_data=1)
             sleep(0.05)
 
         print(f'closing pysimplegui window, terminating thread')
