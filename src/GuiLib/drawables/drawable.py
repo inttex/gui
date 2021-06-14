@@ -6,8 +6,6 @@ import numpy as np
 from matplotlib import patches
 from matplotlib.transforms import Affine2D
 
-from ell_fit import Ellipse
-
 
 def plot_line(spt, ept, ax, color='-', linewidth=0.5, markersize=2):
     ax.plot([spt[0], ept[0]], [spt[1], ept[1]], color, linewidth=linewidth, markersize=markersize)
@@ -133,36 +131,6 @@ class DrawableCirc(Drawable):
     def get_data(self):
         return self.x, self.y, self.radius
 
-
-class DrawableEllipse(Drawable):
-    def __init__(self, name,
-                 data=(0, 0, 10),
-                 do_draw=True,
-                 transform_to_vis=Affine2D(),
-                 args=(), **kwargs):
-        super().__init__(name, do_draw, transform_to_vis)
-        self.ell: Ellipse = self.update(data)
-        self.args = args
-        self.kwargs = kwargs
-
-    def _draw(self, ax):
-        ell = self.ell
-        ellipse_patch = patches.Ellipse(ell.center, ell.r_major * 2, ell.r_minor * 2, np.degrees(ell.angle_rad_major),
-                                        fill=False, *self.args, **self.kwargs)
-        keys = self.kwargs.keys()
-        keys = [k for k in keys if k not in ['alpha', 'transparency']]
-        kwargs = {key: self.kwargs[key] for key in keys}
-        plot_vect(ell.center, ell.r_major * get_rot_mat(ell.angle_rad_major).dot(np.array([1, 0])), ax=ax, *self.args, **kwargs)
-        plot_vect(ell.center, 0.5 * ell.r_minor * get_rot_mat(ell.angle_rad_major).dot(np.array([0, 1])), ax=ax, *self.args, **kwargs)
-        ax.add_artist(ellipse_patch)
-        return [ellipse_patch, ]
-
-    def update(self, data):
-        self.ell = data
-        return data
-
-    def get_data(self):
-        return self.ell
 
 
 class DrawableSegments(Drawable):

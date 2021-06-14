@@ -5,8 +5,7 @@ from typing import List, NamedTuple
 
 from matplotlib.transforms import Affine2D
 
-from GuiLib.drawables.drawable import DrawableImg, DrawablePts, DrawableCirc, DrawableQuiver, DrawableEllipse, DrawableSegments, Drawable
-from AlgoLib.application.drawables.drawables_topo import TopoEllipse
+from GuiLib.drawables.drawable import DrawableImg, DrawablePts, DrawableCirc, DrawableQuiver, DrawableSegments, Drawable
 
 class DrawableTuple(NamedTuple):
     ax_name: str
@@ -43,10 +42,8 @@ class MatplotlibDrawableCollector(DrawableCollectorInterface):
     def __init__(self):
         self.lookup = dict({DrawableType.PTS: DrawablePts,
                             DrawableType.IMG: DrawableImg,
-                            DrawableType.ELL: DrawableEllipse,
                             DrawableType.CIRC: DrawableCirc,
                             DrawableType.QUIV: DrawableQuiver,
-                            DrawableType.TOPO_ELL: TopoEllipse,
                             DrawableType.SEGMENTS: DrawableSegments,
                             })
         self._new_drawables = []
