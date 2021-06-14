@@ -14,8 +14,10 @@ def main():
     print('init controller')
     controller.init_with_model_n_view(model, [pysimplegui_tree_view])
 
-    while pysimplegui_tree_view.is_running():
-        sleep(0.01)
+    # while pysimplegui_tree_view.is_running():
+    #     sleep(0.01)
+
+    pysimplegui_tree_view.loop()
 
 
 if __name__ == '__main__':

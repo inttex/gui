@@ -69,9 +69,12 @@ class ViewWithTree(ViewInterface):
         collection.add_drawable(DrawablePts('pts2', pts=np.array([2 * x, 2 * np.sin(2 * x)]).T, args=('g-',)))
         collection.add_drawable(DrawablePts('pts3', pts=np.array([2 * x, 3 + 2 * np.sin(2 * x)]).T, args=('g-',)))
         self.do_update_view = True
-        self.thread = Thread(target=self._loop)
-        self.thread.setDaemon(True)
-        self.thread.start()
+        # self.thread = Thread(target=self._loop)
+        # self.thread.setDaemon(True)
+        # self.thread.start()
+
+    def loop(self):
+        self._loop()
 
     def add_drawable(self, fig_name, drawable):
         self.dv.add_drawable(fig_name, drawable)
@@ -126,7 +129,7 @@ class ViewWithTree(ViewInterface):
             if event == '-SLIDER-':
                 slider_value = values['-SLIDER-']
                 self.text.update(slider_value)
-                self.controller.topo_algo(input_data=slider_value, dv=self.dv)
+                self.controller.apply_algo(input_data=slider_value, dv=self.dv)
             if event == '-T0-':
                 y = 2 * np.linspace(0, 3, 100, endpoint=False) - 8
                 x = 10 * np.sin(y * 1.2) + 10
@@ -153,3 +156,5 @@ class ViewWithTree(ViewInterface):
 
     def update_view(self):
         self.do_update_view = True
+
+
