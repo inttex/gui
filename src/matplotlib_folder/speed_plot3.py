@@ -36,6 +36,7 @@ for i in np.arange(100):
     ax.draw_artist(ch[2])
     fig.canvas.blit()
     fig.canvas.flush_events()
+    fig.show()
 tend = time.time()
 totfast = tend - tstart
 
