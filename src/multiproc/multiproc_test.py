@@ -17,7 +17,8 @@ def main():
     proc = multiprocessing.Process(target=func_for_proc, args=(sa, np.shape(a)))
     proc.start()
     proc.join()
-    print(a[0, 0])
+    return_a = shm_as_ndarray(sa, shape=np.shape(a))
+    print(return_a[0, 0])
 
 
 if __name__ == '__main__':
