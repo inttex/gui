@@ -172,8 +172,8 @@ def get_4_pt_groups_sphere(radius, nb_thetas, nb_phis):
     return groups
 
 
-def get_4_pts_groups_cylinder_2pt(radius, pt1, pt2, nb_phis):
-    groups = get_4_pts_groups_cylinder(radius, 1, nb_phis)
+def get_4_pts_groups_cylinder_2pt(radius, pt1, pt2, nb_phis, with_top_bottom=True):
+    groups = get_4_pts_groups_cylinder(radius, 1, nb_phis, with_top_bottom=with_top_bottom)
 
     angle, vector = get_rot_from_vert(pt1, pt2)
 
@@ -255,11 +255,11 @@ class Sphere:
         self.color = color
 
         self.groups_sphere = get_4_pt_groups_sphere(radius=self.radius, nb_thetas=32, nb_phis=32)
-        self.groups_cylinder = get_4_pts_groups_cylinder_2pt(radius=0.4, pt1=[1, 1, 1], pt2=[2, 2, 2],
-                                                             nb_phis=6)
-        thetas = np.linspace(0, 2 * np.pi * 3 / 4, 16, endpoint=True)
+        self.groups_cylinder = get_4_pts_groups_cylinder_2pt(radius=0.4, pt1=[0, 1, 0], pt2=[0, 1.2, 0],
+                                                             nb_phis=30, with_top_bottom=True)
+        thetas = np.linspace(0, 2 * np.pi * 3 / 4, 150, endpoint=True)
         pts = [(np.cos(theta), 0.3, np.sin(theta)) for theta in thetas]
-        self.groups_polyline = get_4_pts_groups_polyline(pts, radius=0.1, nb_corners=6)
+        self.groups_polyline = get_4_pts_groups_polyline(pts, radius=0.1, nb_corners=16)
 
     def submit(self, layer=None):
         if layer is None:
