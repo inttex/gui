@@ -4,6 +4,8 @@ import dearpygui.dearpygui as dpg
 import math
 import numpy as np
 
+from geom import get_translation_matrix, get_rot_from_vert, get_rotation_matrix, get_scaleY_matrix
+
 dpg.create_context()
 dpg.configure_app(init_file="custom_layout.ini")
 dpg.create_viewport()
@@ -148,6 +150,12 @@ def getxyz_sphere(r, theta, phi):
     return [x, y, z]
 
 
+def getxyz_cylinder(radius, height, phi):
+    x = radius * np.cos(phi)
+    z = radius * np.sin(phi)
+    return [x, height, z]
+
+
 def get_4_pt_groups_sphere(radius, nb_thetas, nb_phis):
     d_theta = np.pi / nb_thetas
     d_phi = 2 * np.pi / nb_phis
@@ -164,20 +172,60 @@ def get_4_pt_groups_sphere(radius, nb_thetas, nb_phis):
     return groups
 
 
-def get_4_pts_groups_cylinder_2pt(radius, pt1, pt2, nb_thetas):
-    get_4_pts_groups_cylinder(radius, 1, nb_thetas)
-    transform_pts
+def get_4_pts_groups_cylinder_2pt(radius, pt1, pt2, nb_phis):
+    groups = get_4_pts_groups_cylinder(radius, 1, nb_phis)
+
+    angle, vector = get_rot_from_vert(pt1, pt2)
+
+    R = get_rotation_matrix(vector, -angle)
+    S = get_scaleY_matrix(pt1, pt2)
+    T = get_translation_matrix(*pt1)
+
+    groups2 = []
+    for group in groups:
+        for i in range(4):
+            group[i] = T.dot(R.dot(S.dot(np.array([*group[i], 1]))))
+        groups2.append(group)
+    return groups2
 
 
-def get_4_pts_groups_cylinder(radius, height, nb_thetas):
-    todo
+def get_4_pts_groups_cylinder(radius, height, nb_phis, with_top_bottom=True):
+    d_phi = 2 * np.pi / nb_phis
+    groups = []
+    for phi in np.linspace(0, 2 * np.pi, nb_phis, endpoint=False):
+        pts4 = [
+            getxyz_cylinder(radius, 0, phi + d_phi),
+            getxyz_cylinder(radius, height, phi + d_phi),
+            getxyz_cylinder(radius, height, phi),
+            getxyz_cylinder(radius, 0, phi),
+        ]
+        groups.append(pts4)
+        if with_top_bottom:
+            # very ugly
+            pts4 = [
+                [radius * np.cos(phi + d_phi), height, radius * np.sin(phi + d_phi)],
+                [0, height, 0],
+                [radius * np.cos(phi), height, radius * np.sin(phi)],
+                [0, height, 0],
+            ]
+            groups.append(pts4)
+            pts4 = [
+                [0, 0, 0],
+                [radius * np.cos(phi + d_phi), 0, radius * np.sin(phi + d_phi)],
+                [radius * np.cos(phi), 0, radius * np.sin(phi)],
+                [0, 0, 0],
+            ]
+            groups.append(pts4)
+    return groups
 
 
 def get_4_pts_groups_polyline(pts, radius, nb_corners=6):
     groups = []
     for pt1, pt2 in itertools.pairwise(pts):
-        for corner:
-            get_4_pts_groups_cylinder_2pt(radius, pt1, pt2, nb_corners)
+        groups_tmp = get_4_pts_groups_cylinder_2pt(radius, pt1, pt2, nb_corners)
+        for group in groups_tmp:
+            groups.append(group)
+    return groups
 
 
 def draw_4_pt_groups(groups, color, fill, thickness):
@@ -207,6 +255,11 @@ class Sphere:
         self.color = color
 
         self.groups_sphere = get_4_pt_groups_sphere(radius=self.radius, nb_thetas=32, nb_phis=32)
+        self.groups_cylinder = get_4_pts_groups_cylinder_2pt(radius=0.4, pt1=[1, 1, 1], pt2=[2, 2, 2],
+                                                             nb_phis=6)
+        thetas = np.linspace(0, 2 * np.pi * 3 / 4, 16, endpoint=True)
+        pts = [(np.cos(theta), 0.3, np.sin(theta)) for theta in thetas]
+        self.groups_polyline = get_4_pts_groups_polyline(pts, radius=0.1, nb_corners=6)
 
     def submit(self, layer=None):
         if layer is None:
@@ -220,6 +273,12 @@ class Sphere:
         with dpg.draw_node(tag=self.sphere_solid):
             draw_4_pt_groups(groups=self.groups_sphere, color=[255, 255, 255, 10],
                              fill=self.color, thickness=1)
+
+            draw_4_pt_groups(groups=self.groups_cylinder, color=[255, 20, 50, 10],
+                             fill=[255, 20, 50, 255], thickness=1)
+
+            draw_4_pt_groups(groups=self.groups_polyline, color=[255, 255, 255, 10],
+                             fill=[20, 255, 30, 255], thickness=2)
 
             draw_quarter_lines = False
             if draw_quarter_lines:
@@ -289,7 +348,7 @@ class Sphere:
 
 
 camera = Camera(dpg.mvVec4(0.0, 0.0, 0.0, 1.0), 0.0, 0.0)
-sphere = Sphere(radius=10, alpha=255, color=[100, 100, 100, 255])
+sphere = Sphere(radius=1, alpha=255, color=[100, 100, 100, 255])
 
 # sphere2 = Sphere(pos=[0, 4, 6, ], radius=5, alpha=255, color=[255, 155, 155, 255])
 camera.show_controls()
